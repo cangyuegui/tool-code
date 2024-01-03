@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>无限滚动</title>
+    <style>
+        .box {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            margin: 10px;
+            display: inline-block;
+            overflow: hidden;  /* 隐藏溢出的内容 */
+        }
+        .box iframe, .box img {
+            max-width: 100%;  /* 最大宽度为 .box 的宽度 */
+            max-height: 100%;  /* 最大高度为 .box 的高度 */
+        }
+        #container {
+            white-space: nowrap;
+            overflow: hidden;  /* 隐藏滚动条 */
+            overflow-y: hidden;  /* 隐藏垂直滚动条 */
+            display: flex;  /* 使用flex布局 */
+            justify-content: center;  /* 水平居中 */
+            align-items: center;  /* 垂直居中 */
+            height: 96vh;  /* 容器高度为视口的100% */
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script>
+        var container = document.getElementById("container");
+        var position = 0;  // 当前坐标
+        var boxWidth = 120;  // 每个框的总宽度（包括边距）
+        var viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;  // 视口的宽度
+        var boxCount = Math.floor(viewportWidth / boxWidth);  // 可以显示的框的数量
+
+        // 初始加载 boxCount 个框
+        for (var i = 0; i < boxCount; i++) {
+            var box = document.createElement("div");
+            box.className = "box";
+            var content = getContent(i + 1);
+            box.appendChild(content);
+            container.appendChild(box);
+        }
+
+        // 监听键盘事件
+        window.addEventListener("keydown", function(event) {
+            var box = document.createElement("div");
+            box.className = "box";
+
+            switch (event.key) {
+                case "ArrowRight":
+                    position++;
+                    var content = getContent(position);
+                    box.appendChild(content);
+                    container.appendChild(box);  // 向右移动时，在右边添加新的框
+                    if (container.children.length > boxCount) {
+                        container.removeChild(container.firstChild);  // 删除最左边的框
+                    }
+                    break;
+                case "ArrowLeft":
+                    position--;
+                    var content = getContent(position);
+                    box.appendChild(content);
+                    container.insertBefore(box, container.firstChild);  // 向左移动时，在左边添加新的框
+                    if (container.children.length > boxCount) {
+                        container.removeChild(container.lastChild);  // 删除最右边的框
+                    }
+                    break;
+            }
+        });
+
+        // 监听窗口大小改变事件
+        window.addEventListener("resize", function() {
+            viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;  // 更新视口的宽度
+            var newBoxCount = Math.floor(viewportWidth / boxWidth);  // 计算新的可以显示的框的数量
+
+            if (newBoxCount > boxCount) {
+                // 如果新的数量大于旧的数量，添加新的框
+                for (var i = 0; i < newBoxCount - boxCount; i++) {
+                    var box = document.createElement("div");
+                    box.className = "box";
+                    var content = getContent(position + i + 1);
+                    box.appendChild(content);
+                    container.appendChild(box);
+                }
+            } else if (newBoxCount < boxCount) {
+                // 如果新的数量小于旧的数量，删除多余的框
+                for (var i = 0; i < boxCount - newBoxCount; i++) {
+                    container.removeChild(container.lastChild);
+                }
+            }
+
+            boxCount = newBoxCount;  // 更新可以显示的框的数量
+        });
+
+        // 根据 index 获取内容
+        function getContent(index) {
+            var element;
+
+            // 在这里添加你的逻辑
+            // 例如，你可以根据 index 的值来决定显示什么内容：
+            if (index % 3 === 0) {
+                // 显示一个 iframe
+                element = document.createElement("iframe");
+                element.src = "https://www.example.com";
+            } else if (index % 3 === 1) {
+                // 显示一个图片
+                element = document.createElement("img");
+                element.src = "https://th.bing.com/th?id=ODL.3ceda1a32a659b6022236a50a7bf5a49&w=298&h=444&c=10&rs=1&qlt=99&o=6&dpr=1.5&pid=13.1";
+            } else {
+                // 显示一个 canvas
+                element = document.createElement("canvas");
+                // 在这里添加你的 JavaScript 动画代码
+            }
+
+            return element;
+        }
+    </script>
+</body>
+</html>
