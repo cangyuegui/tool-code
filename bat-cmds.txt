@@ -1,2 +1,5 @@
 对文件夹特定后缀名批量操作
 >for %A in (*.rmvb) do ffmpeg -hwaccel nvdec -i "%~nA.rmvb" -c:v h264_nvenc "%~nA.mp4"
+
+使用node.js来执行这个js文件
+for %A in (*.rm) do node ./convert.js %A
